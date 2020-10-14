@@ -6,6 +6,7 @@ app.set("view engine", "pug");
 app.set("views", "views");
 
 router.get("/", (req, res, next) => {
+    
     res.status(200).render("login");
 })
 
