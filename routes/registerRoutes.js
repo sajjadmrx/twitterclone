@@ -31,8 +31,29 @@ router.post("/", async (req, res, next) => {
                 { email: email }
             ]
         })
-        console.log(user);
-        console.log("heelo");
+        .catch((error) => {
+            console.log(error);
+            payload.errorMessage = "Something went wrong.";
+            res.status(200).render("register", payload);
+        });
+
+        if(user == null) {
+            // No user found
+
+        }
+        else {
+            // User found
+            if (email == user.email) {
+                payload.errorMessage = "Email already in use.";
+            }
+            else {
+                payload.errorMessage = "Username already in use.";
+            }
+            res.status(200).render("register", payload);
+        }
+        
+        
+
     }
     else {
         payload.errorMessage = "Make sure each field has a valid value.";
