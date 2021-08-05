@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3003;
+const port = 3000;
 const middleware = require('./middleware')
 const path = require('path')
 const bodyParser = require("body-parser")
@@ -21,19 +21,7 @@ app.use(session({
     saveUninitialized: false
 }))
 
-// Routes
-const loginRoute = require('./routes/loginRoutes');
-const registerRoute = require('./routes/registerRoutes');
 
-app.use("/login", loginRoute);
-app.use("/register", registerRoute);
 
-app.get("/", middleware.requireLogin, (req, res, next) => {
+app.use(require('./routes/index'));
 
-    var payload = {
-        pageTitle: "Home",
-        userLoggedIn: req.session.user
-    }
-
-    res.status(200).render("home", payload);
-})

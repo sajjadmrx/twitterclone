@@ -1,14 +1,11 @@
 const express = require('express');
-const app = express();
+
 const router = express.Router();
-const bodyParser = require("body-parser")
+
 const bcrypt = require("bcrypt");
 const User = require('../schemas/UserSchema');
 
-app.set("view engine", "pug");
-app.set("views", "views");
 
-app.use(bodyParser.urlencoded({ extended: false }));
 
 router.get("/", (req, res, next) => {
 
@@ -25,29 +22,29 @@ router.post("/", async (req, res, next) => {
 
     var payload = req.body;
 
-    if(firstName && lastName && username && email && password) {
+    if (firstName && lastName && username && email && password) {
         var user = await User.findOne({
             $or: [
                 { username: username },
                 { email: email }
             ]
         })
-        .catch((error) => {
-            console.log(error);
-            payload.errorMessage = "Something went wrong.";
-            res.status(200).render("register", payload);
-        });
+            .catch((error) => {
+                console.log(error);
+                payload.errorMessage = "Something went wrong.";
+                res.status(200).render("register", payload);
+            });
 
-        if(user == null) {
+        if (user == null) {
             // No user found
             var data = req.body;
             data.password = await bcrypt.hash(password, 10);
 
             User.create(data)
-            .then((user) => {
-                req.session.user = user;
-                return res.redirect("/");
-            })
+                .then((user) => {
+                    req.session.user = user;
+                    return res.redirect("/");
+                })
         }
         else {
             // User found
