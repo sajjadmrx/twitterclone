@@ -34,7 +34,7 @@ function createPostHtml(post) {
     // return post.content
 
     const postedBy = post.postedBy
-
+    const timestep = moment(post.createdAt).fromNow()
     return `
     <div class='post' >
 <div class='mainContentContainer'>
@@ -44,7 +44,11 @@ function createPostHtml(post) {
         </div>
 
         <div class='postContentContainer'>
-            <div class='header'></div>
+            <div class='header'>
+                <a href='/profile/${postedBy.username}'>${postedBy.firstName}</a>
+                <span class='username'>@${postedBy.username}</span>
+                <span class='date'>${timestep}</span>
+            </div>
             <div class='postBody'>
                 <span>${post.content}</span>
             </div>
