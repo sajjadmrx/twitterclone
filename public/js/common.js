@@ -21,7 +21,7 @@ $('#submitPostButton').click((e) => {
 
     if (value == '')
         return alert('No text to post!')
-    var data = { content: value }
+    var data = { /*content: value*/ }
     $.post('/api/posts', data, (postData, status, xhr) => {
         alert(postData)
     })
