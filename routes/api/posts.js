@@ -8,7 +8,10 @@ const postsModel = require('../../schemas/PostSchema');
 
 
 
-
+router.get('/', async (req, res, next) => {
+    const posts = await postsModel.find({}, {}, { sort: { createdAt: -1 }, populate: [{ path: 'postedBy', select: '-email -password' }] });
+    res.json(posts);
+})
 router.post("/", async (req, res, next) => {
     if (!req.body.content)
         return res.sendStatus(400)
