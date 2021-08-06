@@ -30,17 +30,27 @@ $('#submitPostButton').click((e) => {
     })
 })
 
-$(document).on('click', '.likeButton', () => {
-    alert('like button clicked')
+$(document).on('click', '.likeButton', (event) => {
+    var postId = getPostIdFromElemnet(event.target)
+    console.log(postId)
 })
 
+function getPostIdFromElemnet(element) {
+    var isRoot = element.classList.contains('post')
+
+    var rootElement = isRoot ? element : element.closest('.post')
+    var postId = rootElement.dataset.id
+
+    return postId
+
+}
 function createPostHtml(post) {
     // return post.content
 
     const postedBy = post.postedBy
     const timestep = moment(post.createdAt).fromNow()
     return `
-    <div class='post' >
+    <div class='post' data-id='${post._id}'>
 <div class='mainContentContainer'>
 
         <div class='userImageContainer'>
