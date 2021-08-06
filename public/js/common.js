@@ -30,6 +30,10 @@ $('#submitPostButton').click((e) => {
     })
 })
 
+$(document).on('click', '.likeButton', () => {
+    alert('like button clicked')
+})
+
 function createPostHtml(post) {
     // return post.content
 
@@ -65,7 +69,7 @@ function createPostHtml(post) {
                                 </button>
                             </div>
                             <div class='postButtonContainer'>
-                                <button>
+                                <button class='likeButton'>
                                     <i class='far fa-heart'></i>
                                 </button>
                             </div>
