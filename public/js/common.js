@@ -1,4 +1,5 @@
 $('#postTextarea').keyup((e) => {
+    console.log(userLoggedIn)
     var textbox = $(event.target)
     const value = textbox.val().trim()
     console.log(value)
@@ -31,15 +32,24 @@ $('#submitPostButton').click((e) => {
 })
 
 $(document).on('click', '.likeButton', (event) => {
+    var button = $(event.target)
     var postId = getPostIdFromElemnet(event.target)
-    console.log(postId)
 
 
     $.ajax({
         url: `/api/posts/${postId}/like`,
         type: 'PUT',
         success: (data, status, xhr) => {
-            console.log(data)
+            button.find('span').text(data.likes.length || '')
+            if (data.likes.includes(userLoggedIn._id)) {
+                button.addClass('active')
+                console.log('liked')
+
+            } else {
+                button.removeClass('active')
+                console.log('unliked')
+
+            }
         }
     })
 })
@@ -58,6 +68,7 @@ function createPostHtml(post) {
 
     const postedBy = post.postedBy
     const timestep = moment(post.createdAt).fromNow()
+    var likeClass = post.likes.includes(userLoggedIn._id) ? 'active' : ''
     return `
     <div class='post' data-id='${post._id}'>
 <div class='mainContentContainer'>
@@ -87,9 +98,10 @@ function createPostHtml(post) {
                                     <i class='fas fa-retweet'></i>
                                 </button>
                             </div>
-                            <div class='postButtonContainer'>
-                                <button class='likeButton'>
+                            <div class='postButtonContainer red'>
+                                <button class='likeButton  ${likeClass} '>
                                     <i class='far fa-heart'></i>
+                                    <span>${post.likes.length || ''}</span>
                                 </button>
                             </div>
 

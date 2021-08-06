@@ -49,7 +49,10 @@ router.put('/:id/like', async (req, res, next) => {
                 console.log(err);
                 res.status(500).send(err);
             })
-        res.status(200)
+
+        // insert post like
+        const post = await postsModel.findByIdAndUpdate(postId, { [option]: { likes: userId } }, { new: true })
+        res.status(200).send(post);
 
     } catch (error) {
         console.log(error)
