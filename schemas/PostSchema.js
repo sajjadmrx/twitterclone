@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     content: { type: String, trim: true },
     postedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     pinned: { type: Boolean, default: false },
+    likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', UserSchema);
