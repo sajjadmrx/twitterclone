@@ -33,6 +33,15 @@ $('#submitPostButton').click((e) => {
 $(document).on('click', '.likeButton', (event) => {
     var postId = getPostIdFromElemnet(event.target)
     console.log(postId)
+
+
+    $.ajax({
+        url: `/api/posts/${postId}/like`,
+        type: 'PUT',
+        success: (data, status, xhr) => {
+            console.log(data)
+        }
+    })
 })
 
 function getPostIdFromElemnet(element) {
