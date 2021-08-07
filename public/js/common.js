@@ -52,6 +52,20 @@ $(document).on('click', '.likeButton', (event) => {
             }
         }
     })
+});
+
+$(document).on('click', '.retweetButton', (event) => {
+    var button = $(event.target)
+    var postId = getPostIdFromElemnet(event.target)
+
+
+    $.ajax({
+        url: `/api/posts/${postId}/retweet`,
+        type: 'PUT',
+        success: (data, status, xhr) => {
+            console.log(data)
+        }
+    })
 })
 
 function getPostIdFromElemnet(element) {
@@ -94,7 +108,7 @@ function createPostHtml(post) {
                                 </button>
                             </div>
                             <div class='postButtonContainer'>
-                                <button>
+                                <button class='retweetButton'>
                                     <i class='fas fa-retweet'></i>
                                 </button>
                             </div>
