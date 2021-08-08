@@ -63,8 +63,19 @@ $(document).on('click', '.retweetButton', (event) => {
         url: `/api/posts/${postId}/retweet`,
         type: 'PUT',
         success: (data, status, xhr) => {
-            console.log(data)
+
+            button.find('span').text(data.retweetUsers.length || '')
+            if (data.retweetUsers.includes(userLoggedIn._id)) {
+                button.addClass('active')
+
+
+            } else {
+                button.removeClass('active')
+            }
+
+
         }
+
     })
 })
 
@@ -80,11 +91,33 @@ function getPostIdFromElemnet(element) {
 function createPostHtml(post) {
     // return post.content
 
+
+    const isRetweet = post.retweetData !== undefined;
+    const retweetBy = isRetweet ? post.postedBy.username : null
+    post = isRetweet ? post.retweetData : post
+
+
     const postedBy = post.postedBy
     const timestep = moment(post.createdAt).fromNow()
     var likeClass = post.likes.includes(userLoggedIn._id) ? 'active' : ''
+    var retweetClass = post.retweetUsers.includes(userLoggedIn._id) ? 'active' : ''
+
+    var retweetText = ''
+    if (isRetweet) {
+        retweetText = `<span>
+          <i class='fas fa-retweet'></i>
+        Retweeted by <a href='/profile/${retweetBy}'>${retweetBy}</a> 
+        
+        </span>`
+    }
+
+
+
     return `
     <div class='post' data-id='${post._id}'>
+    <div class='postActionContainer'>
+            ${retweetText}
+    </div>
 <div class='mainContentContainer'>
 
         <div class='userImageContainer'>
@@ -107,9 +140,10 @@ function createPostHtml(post) {
                                     <i class='far fa-comment'></i>
                                 </button>
                             </div>
-                            <div class='postButtonContainer'>
-                                <button class='retweetButton'>
+                            <div class='postButtonContainer green'>
+                                <button class='retweetButton ${retweetClass}'>
                                     <i class='fas fa-retweet'></i>
+                                        <span>${post.retweetUsers.length || ''}</span>
                                 </button>
                             </div>
                             <div class='postButtonContainer red'>

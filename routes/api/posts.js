@@ -9,7 +9,14 @@ const postsModel = require('../../schemas/PostSchema');
 
 
 router.get('/', async (req, res, next) => {
-    const posts = await postsModel.find({}, {}, { sort: { createdAt: -1 }, populate: [{ path: 'postedBy', select: '-email -password' }] });
+    let posts = await postsModel.find({}, {}, {
+        sort: { createdAt: -1 },
+        populate: [
+            { path: 'postedBy', select: '-email -password' },
+            { path: 'retweetData' },
+        ]
+    });
+    posts = await userModel.populate(posts, { path: 'retweetData.postedBy' })
     res.json(posts);
 })
 router.post("/", async (req, res, next) => {
@@ -61,25 +68,31 @@ router.put('/:id/like', async (req, res, next) => {
 router.put('/:id/retweet', async (req, res, next) => {
     try {
 
-
-        return res.status(200).send(req.session.user);
         const postId = req.params.id;
         const userId = req.session.user._id
 
 
-        const isLiked = req.session.user.likes && req.session.user.likes.includes(postId);
+        // Try and delete the retweet
+        const deletedPost = await postsModel.findOneAndDelete({ postedBy: userId, retweetData: postId })
 
-        var option = isLiked ? "$pull" : "$addToSet";
+
+
+        var option = deletedPost !== null ? "$pull" : "$addToSet";
+
+        let repost = deletedPost;
+
+        if (!repost)
+            repost = await postsModel.create({ postedBy: userId, retweetData: postId })
 
         // insert user like
-        req.session.user = await userModel.findByIdAndUpdate(userId, { [option]: { likes: postId } }, { new: true })
+        req.session.user = await userModel.findByIdAndUpdate(userId, { [option]: { retweets: repost._id } }, { new: true })
             .catch(err => {
                 console.log(err);
                 res.status(500).send(err);
             })
 
         // insert post like
-        const post = await postsModel.findByIdAndUpdate(postId, { [option]: { likes: userId } }, { new: true })
+        const post = await postsModel.findByIdAndUpdate(postId, { [option]: { retweetUsers: userId } }, { new: true })
         res.status(200).send(post);
 
     } catch (error) {
