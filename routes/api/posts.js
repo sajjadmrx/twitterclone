@@ -9,17 +9,22 @@ const postsModel = require('../../schemas/PostSchema');
 
 
 router.get('/', async (req, res, next) => {
-    let posts = await postsModel.find({}, {}, {
-        sort: { createdAt: -1 },
-        populate: [
-            { path: 'postedBy', select: '-email -password' },
-            { path: 'retweetData' },
-        ]
-    });
-    posts = await userModel.populate(posts, { path: 'retweetData.postedBy' })
+    let posts = await getPosts()
     res.json(posts);
 })
+router.get('/:id', async (req, res, next) => {
+    let posts = await getPosts({ _id: req.params.id })
+    posts = posts[0]
+    res.json(posts);
+})
+
+
+
+
 router.post("/", async (req, res, next) => {
+
+
+
     if (!req.body.content)
         return res.sendStatus(400)
 
@@ -28,6 +33,10 @@ router.post("/", async (req, res, next) => {
         content: req.body.content,
         postedBy: req.session.user
     }
+    if (req.body.replyTo)
+        postData.replyTo = req.body.replyTo
+
+
     try {
         let newPost = await postsModel.create(postData)
         newPost = await userModel.populate(newPost, { path: 'postedBy', select: '-password -email' })
@@ -39,6 +48,8 @@ router.post("/", async (req, res, next) => {
 
 
 })
+
+
 router.put('/:id/like', async (req, res, next) => {
     try {
         const postId = req.params.id;
@@ -101,4 +112,16 @@ router.put('/:id/retweet', async (req, res, next) => {
     }
 })
 
+async function getPosts(filter = {}) {
+    let results = await postsModel.find(filter, {}, {
+        sort: { createdAt: -1 },
+        populate: [
+            { path: 'postedBy', select: '-email -password' },
+            { path: 'retweetData' },
+            { path: 'replyTo' },
+        ]
+    });
+    results = await userModel.populate(results, { path: 'replyTo.postedBy' })
+    return await userModel.populate(results, { path: 'retweetData.postedBy' })
+}
 module.exports = router;

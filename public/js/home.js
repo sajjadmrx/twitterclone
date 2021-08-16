@@ -10,6 +10,9 @@ $(document).ready(function () {
 
 function outputPosts(results, container) {
     container.html(' ')
+    if (!Array.isArray(results))
+        results = [results]
+
     results.forEach(post => {
         var html = createPostHtml(post)
         container.append(html)
