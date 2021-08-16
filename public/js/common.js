@@ -87,6 +87,22 @@ $('#replyModal').on('hidden.bs.modal', () => {
     $('#orginalPostContainer').html('')
 })
 
+
+$('#deletePostModal').on('show.bs.modal', (e) => {
+    var button = $(e.relatedTarget)
+    var postId = getPostIdFromElemnet(button[0])
+    $('#deletePostButton').data('id', postId)
+})
+$('#deletePostButton').click(function () {
+    var id = $(this).data('id')
+    $.ajax({
+        url: `/api/posts/${id}`,
+        type: 'DELETE',
+        success: (data, status, xhr) => {
+            window.location.reload()
+        }
+    })
+})
 $(document).on('click', '.retweetButton', (event) => {
     var button = $(event.target)
     var postId = getPostIdFromElemnet(event.target)
@@ -112,8 +128,9 @@ $(document).on('click', '.retweetButton', (event) => {
     })
 })
 $(document).on('click', '.post', (event) => {
-    const element = $(event.target)
+    let element = $(event.target)
     const postId = getPostIdFromElemnet(element[0])
+
     if (postId && !element.is('button'))
         window.location.href = `/post/${postId}`
 })
@@ -158,7 +175,10 @@ function createPostHtml(post) {
         
         </div>`
     }
-
+    var buttons = "";
+    if (post.postedBy._id == userLoggedIn._id) {
+        buttons = `<button data-id="${post._id}" data-toggle="modal" data-target="#deletePostModal"><i class='fas fa-times'></i></button>`;
+    }
 
     return `
     <div class='post' data-id='${post._id}'>
@@ -176,6 +196,7 @@ function createPostHtml(post) {
                 <a href='/profile/${postedBy.username}'>${postedBy.firstName}</a>
                 <span class='username'>@${postedBy.username}</span>
                 <span class='date'>${timestep}</span>
+                       ${buttons}
             </div>
             ${flag}
             <div class='postBody'>

@@ -227,10 +227,15 @@ button span {
     margin-bottom: 5px;
 }
 
-.replyFlag{
+.replyFlag {
     margin-bottom: 5px;
 }
+
 .replyFlag a {
     color: var(--blue);
+}
 
+.post.largeFont .postBody,
+.post.largeFont .postFooter {
+    font-size: 23px;
 }

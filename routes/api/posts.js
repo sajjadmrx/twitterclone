@@ -58,7 +58,11 @@ router.post("/", async (req, res, next) => {
 
 })
 
-
+router.delete('/:id', async (req, res, next) => {
+    postsModel.findByIdAndDelete(req.params.id)
+        .then(res.sendStatus(200))
+        .catch(res.sendStatus(400))
+})
 router.put('/:id/like', async (req, res, next) => {
     try {
         const postId = req.params.id;
