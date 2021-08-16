@@ -78,7 +78,7 @@ $('#replyModal').on('show.bs.modal', () => {
 
     $.get(`/api/posts/${postId}`, results => {
 
-        outputPosts(results, $('#orginalPostContainer'))
+        outputPosts(results.postData, $('#orginalPostContainer'))
     })
 })
 
@@ -111,7 +111,12 @@ $(document).on('click', '.retweetButton', (event) => {
 
     })
 })
-
+$(document).on('click', '.post', (event) => {
+    const element = $(event.target)
+    const postId = getPostIdFromElemnet(element[0])
+    if (postId && !element.is('button'))
+        window.location.href = `/post/${postId}`
+})
 function getPostIdFromElemnet(element) {
     var isRoot = element.classList.contains('post')
 
@@ -145,7 +150,7 @@ function createPostHtml(post) {
     }
 
     let flag = ''
-    if (post.replyTo) {
+    if (post.replyTo && post.replyTo._id) {
         console.log(post)
         var replyToUsername = post.replyTo.postedBy?.username
         flag = `<div class='replyFlag'>
@@ -157,10 +162,10 @@ function createPostHtml(post) {
 
     return `
     <div class='post' data-id='${post._id}'>
-    <div class='postActionContainer'>
+     <div class='postActionContainer'>
             ${retweetText}
-    </div>
-<div class='mainContentContainer'>
+        </div>
+        <div class='mainContentContainer'>
 
         <div class='userImageContainer'>
             <img class='userImage' src='${postedBy.profilePic}' />
@@ -203,4 +208,35 @@ function createPostHtml(post) {
     
     
     </div>`
+}
+
+function outputPosts(results, container) {
+    container.html(' ')
+    if (!Array.isArray(results))
+        results = [results]
+
+    results.forEach(post => {
+        var html = createPostHtml(post)
+        container.append(html)
+    })
+    if (results.length == 0) {
+        container.append(`<span class='noResults'>No posts found</span>`)
+    }
+}
+
+function outputPostsWithReplies(results, container) {
+    container.html(' ')
+
+
+    if (results.replyTo && results.replyTo._id) {
+        var html = createPostHtml(results.replyTo)
+        container.append(html)
+    }
+
+    var mainPostHtml = createPostHtml(results.postData)
+    container.append(mainPostHtml)
+    results.replies.forEach(reply => {
+        var html = createPostHtml(reply)
+        container.append(html)
+    })
 }

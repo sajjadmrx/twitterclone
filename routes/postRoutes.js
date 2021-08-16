@@ -8,26 +8,24 @@ const User = require('../schemas/UserSchema');
 // import routes
 const loginRoute = require('./login');
 const registerRoute = require('./register');
-const postRoutes = require('./postRoutes');
 
 // import middleware
 const middleware = require('../middleware')
 
 
-router.get("/", middleware.requireLogin, (req, res, next) => {
+router.get("/:id", middleware.requireLogin, (req, res, next) => {
     delete req.session.user.password;
 
     var payload = {
-        pageTitle: "Home",
+        pageTitle: "View post",
         userLoggedIn: req.session.user,
-        userLoggedInJs: JSON.stringify(req.session.user)
+        userLoggedInJs: JSON.stringify(req.session.user),
+        postId: req.params.id,
     }
 
-    res.status(200).render("home", payload);
+    res.status(200).render("postPage", payload);
 })
-router.use('/post', postRoutes)
-router.use('/login', loginRoute);
-router.use('/register', registerRoute);
+
 
 
 module.exports = router;
